@@ -1,0 +1,1074 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>HelloPy | Week 4 Workspace</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Rubik+Bubbles&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      /* HelloPy brand */
+      --navy:#0B3C5D;
+      --navy2:#082E46;
+      --yellow:#FDBA2D;
+
+      /* Workspace */
+      --bg:#eaf2fb;
+      --surface:#f4f8ff;
+      --panel:#e1edf9;
+      --panel2:#d6e7f7;
+      --editor:#0f2237;
+      --console:#0b1320;
+
+      --ink:#0E1726;
+      --muted:#567086;
+      --stroke: rgba(11,60,93,.14);
+      --stroke2: rgba(11,60,93,.18);
+      --text:#0E1726;
+      --shadow:0 18px 40px rgba(0,0,0,.15);
+      --shadowSoft:0 10px 22px rgba(0,0,0,.10);
+      --r12:12px;
+      --r16:16px;
+      --focus: rgba(253,186,45,.55);
+    }
+
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
+
+   
+    html{ overflow-x:hidden; }
+
+    body{
+      margin:0;
+      font-family:Poppins, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background:
+        radial-gradient(900px 520px at 18% 0%, rgba(253,186,45,.22), transparent 60%),
+        radial-gradient(900px 520px at 85% 5%, rgba(11,60,93,.18), transparent 60%),
+        linear-gradient(180deg, #ffffff, var(--bg));
+      color: var(--text);
+      overflow:hidden;
+    }
+
+    
+    .skip-link{
+      position:absolute;
+      left:12px;
+      top:12px;
+      padding:10px 12px;
+      border-radius:12px;
+      background:#fff;
+      border:2px solid var(--yellow);
+      color:var(--navy);
+      font-weight:900;
+      text-decoration:none;
+      transform: translateY(-200%);
+      transition: transform .18s ease;
+      z-index: 999;
+    }
+    .skip-link:focus{ transform: translateY(0); }
+
+    a:focus-visible, button:focus-visible, textarea:focus-visible{
+      outline: 3px solid var(--focus);
+      outline-offset: 3px;
+    }
+
+    /* ---------- TOP BAR  ---------- */
+    .topbar{
+      height:62px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding: 0 14px;
+      border-bottom:1px solid var(--stroke);
+      background: rgba(244,248,255,.88);
+      backdrop-filter: blur(10px);
+    }
+
+    
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:14px;
+      text-decoration:none;
+    }
+
+    .logo-badge{
+      display:flex;
+      align-items:center;
+      gap:18px;
+      padding: 10px 0;
+      position: relative;
+    }
+
+    .logo-mark{
+      width: 52px;
+      height: auto;
+      display:block;
+      transition: transform .25s ease;
+    }
+
+    .brand:hover .logo-mark{
+      transform: translateY(-6px) rotate(-6deg);
+    }
+
+    .logo-text{
+      font-family: Poppins, system-ui;
+      font-weight: 900;
+      font-size: 28px;
+      color: var(--navy);
+      letter-spacing: -.8px;
+      position: relative;
+      display:inline-block;
+      line-height: 1;
+    }
+
+    .logo-text span{
+      color: var(--yellow);
+      display:inline-block;
+      transform: translateY(-4px);
+      border-radius: 10px;
+    }
+
+    .logo-text::after{
+      content:"";
+      position:absolute;
+      left:0;
+      bottom:-8px;
+      width:100%;
+      height:8px;
+      background: rgba(253,186,45,.45);
+      border-radius: 10px;
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform .25s ease;
+    }
+
+    .brand:hover .logo-text::after{ transform: scaleX(1); }
+
+    /* Wiggle animation on click */
+    @keyframes wiggle {
+      0% { transform: rotate(0deg); }
+      25% { transform: rotate(-6deg); }
+      50% { transform: rotate(6deg); }
+      75% { transform: rotate(-4deg); }
+      100% { transform: rotate(0deg); }
+    }
+    .wiggle{ animation: wiggle .5s ease; }
+
+    /* page-load pop */
+    @keyframes popIn {
+      0% { transform: scale(.92); opacity: 0; }
+      70% { transform: scale(1.02); opacity: 1; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    .logo-badge.pop-in{ animation: popIn .55s ease-out both; }
+
+    
+    .brand-sub{
+      margin-left: 10px;
+      padding-left: 10px;
+      border-left: 1px solid rgba(11,60,93,.18);
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 800;
+      letter-spacing: .15px;
+      white-space: nowrap;
+      align-self: center;
+    }
+
+    @media (max-width: 560px){
+      .logo-text{ font-size: 22px; }
+      .logo-mark{ width: 34px; }
+      .logo-badge{ gap: 14px; }
+      .brand-sub{ display:none; } /* keep top bar clean on small screens */
+    }
+
+    .top-actions{ display:flex; align-items:center; gap:10px; }
+    .pill{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:8px 10px;
+      border-radius:999px;
+      background: rgba(11,60,93,.06);
+      border:1px solid rgba(11,60,93,.10);
+      color: var(--navy);
+      font-weight:900;
+      font-size:12px;
+    }
+
+    .btn{
+      border:0; cursor:pointer; font-family:inherit;
+      padding:10px 12px; border-radius:12px;
+      font-weight:900;
+      color:#2A1C00;
+      background: var(--yellow);
+      box-shadow: 0 14px 26px rgba(253,186,45,.25);
+      display:inline-flex; align-items:center; gap:8px;
+      text-decoration:none;
+      font-size:13px;
+    }
+    .btn:active{ transform: translateY(1px); }
+    .btn-run{
+      background: #1d6cc8;
+      color: #fff;
+      box-shadow: 0 8px 20px rgba(29,108,200,.30);
+    }
+    .btn-run:hover{ background: #1a61b4; }
+    .btn-ask{
+      background: rgba(255,255,255,.10);
+      color: rgba(220,235,255,.9);
+      border: 1px solid rgba(255,255,255,.14);
+      box-shadow: none;
+    }
+    .btn-ask:hover{ background: rgba(255,255,255,.16); }
+
+    
+    .kbd{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 11px;
+      padding: 3px 6px;
+      border-radius: 8px;
+      background: rgba(11,60,93,.06);
+      border: 1px solid rgba(11,60,93,.10);
+      color: rgba(11,60,93,.85);
+      font-weight: 900;
+    }
+
+    /* ---------- APP LAYOUT ---------- */
+    .app{
+      height: calc(100vh - 62px);
+      display:grid;
+      grid-template-columns: 56px 500px 1fr;
+    }
+
+    /* Left icon bar */
+    .iconbar{
+      border-right:1px solid var(--stroke);
+      background: var(--panel2);
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      padding: 10px 0;
+      gap: 10px;
+    }
+    .ic{
+      width:38px; height:38px;
+      border-radius:14px;
+      display:grid; place-items:center;
+      background: rgba(255,255,255,.55);
+      border: 1px solid var(--stroke);
+      color: var(--navy);
+      font-weight:900;
+      user-select:none;
+      box-shadow: 0 8px 16px rgba(0,0,0,.06);
+    }
+    .ic.active{
+      outline: 2px solid rgba(253,186,45,.40);
+      background: rgba(253,186,45,.22);
+    }
+    .spacer{ flex:1; }
+
+    /* Left panels area — dark IDE style */
+    .sidepanels{
+      border-right:1px solid rgba(255,255,255,.08);
+      background: #16202e;
+      display:flex;
+      flex-direction:column;
+      min-width: 0;
+      overflow-y: auto;
+    }
+
+    /* Panel header bar */
+    .side-header{
+      padding: 12px 14px 10px;
+      border-bottom:1px solid rgba(255,255,255,.07);
+      display:flex; align-items:center; justify-content:space-between;
+      gap:10px;
+      background: rgba(255,255,255,.04);
+    }
+    .side-title{
+      font-weight:900; font-size:11px; letter-spacing:.6px;
+      color: rgba(180,200,220,.75);
+      text-transform: uppercase;
+    }
+    .chip{
+      font-size:11px;
+      font-weight:900;
+      padding:5px 9px;
+      border-radius:999px;
+      background: rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.12);
+      color: rgba(200,220,240,.85);
+    }
+
+    /* Generic panel block */
+    .panel-block{
+      padding: 12px 16px;
+      border-bottom: 1px solid rgba(255,255,255,.06);
+    }
+    .mini-label{
+      font-size:10px;
+      font-weight:900;
+      letter-spacing:.5px;
+      text-transform:uppercase;
+      color: rgba(180,200,220,.55);
+      margin-bottom: 10px;
+      display:flex; align-items:center; justify-content:space-between;
+    }
+
+    /* ── "The Language" section ── */
+    .section-title{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      margin-bottom: 10px;
+    }
+    .section-title h2{
+      margin:0;
+      font-size:15px;
+      font-weight:900;
+      color: rgba(220,235,250,.95);
+    }
+    .section-actions{ display:flex; gap:7px; }
+    .tag-btn{
+      font-size:11px;
+      font-weight:900;
+      padding:5px 10px;
+      border-radius:8px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.07);
+      color: rgba(200,220,240,.85);
+      cursor:pointer;
+    }
+    .tag-btn:hover{ background: rgba(255,255,255,.13); }
+
+    .lang-desc{
+      font-size:12.5px;
+      font-weight:600;
+      color: rgba(190,210,230,.82);
+      line-height: 1.5;
+    }
+    .lang-desc strong{
+      color: rgba(220,235,255,.95);
+      font-weight:900;
+    }
+
+    /* ── Challenge section ── */
+    .challenge-section{
+      padding: 12px 16px;
+      border-bottom: 1px solid rgba(255,255,255,.06);
+    }
+    .challenge-head{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      margin-bottom:10px;
+    }
+    .challenge-head h2{
+      margin:0;
+      font-size:15px;
+      font-weight:900;
+      color: rgba(220,235,250,.95);
+      display:flex; align-items:center; gap:8px;
+    }
+    .badge-beginner{
+      font-size:11px;
+      font-weight:900;
+      padding:4px 10px;
+      border-radius:999px;
+      background: rgba(40,199,111,.18);
+      border:1px solid rgba(40,199,111,.30);
+      color: #5de8a0;
+    }
+
+    .challenge-desc{
+      font-size:12.5px;
+      font-weight:600;
+      color: rgba(190,210,230,.82);
+      line-height: 1.5;
+      margin: 0 0 12px;
+    }
+
+    .what-to-do{
+      font-size:12px;
+      font-weight:900;
+      color: rgba(180,200,220,.75);
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing:.4px;
+    }
+    .step-list{
+      margin:0 0 14px;
+      padding:0;
+      list-style:none;
+      display:grid;
+      gap: 7px;
+    }
+    .step-list li{
+      display:flex;
+      align-items:flex-start;
+      gap:10px;
+      font-size:13px;
+      font-weight:700;
+      color: rgba(190,210,230,.88);
+      line-height:1.45;
+    }
+    .step-num{
+      flex:0 0 auto;
+      width:20px; height:20px;
+      border-radius:8px;
+      background: rgba(11,60,93,.55);
+      border:1px solid rgba(255,255,255,.12);
+      display:grid; place-items:center;
+      font-size:11px;
+      font-weight:900;
+      color: rgba(200,220,240,.9);
+    }
+    .step-code{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Courier New", monospace;
+      background: rgba(255,255,255,.10);
+      padding: 2px 6px;
+      border-radius:6px;
+      font-size:12px;
+      color: #7ee787;
+    }
+
+    .explain-btn{
+      display:inline-flex;
+      align-items:center;
+      gap:7px;
+      font-size:12px;
+      font-weight:900;
+      color: #60a5fa;
+      background: rgba(96,165,250,.10);
+      border:1px solid rgba(96,165,250,.22);
+      border-radius:10px;
+      padding:7px 12px;
+      cursor:pointer;
+    }
+    .explain-btn:hover{ background: rgba(96,165,250,.18); }
+
+    /* ── Solution accordion ── */
+    .solution-section{
+      padding: 12px 16px;
+    }
+    .solution-head{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      margin-bottom: 10px;
+    }
+    .solution-head h2{
+      margin:0;
+      font-size:15px;
+      font-weight:900;
+      color: rgba(220,235,250,.95);
+      display:flex; align-items:center; gap:8px;
+    }
+    .solution-toggle{
+      width:100%;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding: 12px 14px;
+      border-radius:12px;
+      background: rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.10);
+      cursor:pointer;
+      color: rgba(200,220,240,.88);
+      font-weight:900;
+      font-size:13px;
+    }
+    .solution-toggle:hover{ background: rgba(255,255,255,.10); }
+    .solution-arrow{ font-size:16px; transition: transform .2s ease; }
+    .solution-toggle.open .solution-arrow{ transform: rotate(90deg); }
+    .solution-body{
+      display:none;
+      margin-top:8px;
+      padding:12px;
+      border-radius:12px;
+      background: rgba(15,34,55,.70);
+      border:1px solid rgba(255,255,255,.08);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Courier New", monospace;
+      font-size:13px;
+      color: #7ee787;
+      line-height:1.6;
+    }
+    .solution-body.open{ display:block; }
+
+    /* file entry (kept for compatibility) */
+    .file{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      padding:10px 10px;
+      border-radius: 12px;
+      border:1px solid transparent;
+      color: rgba(200,220,240,.90);
+      font-weight:900;
+      cursor:pointer;
+      user-select:none;
+      background: rgba(255,255,255,.05);
+    }
+    .file:hover{ background: rgba(255,255,255,.09); }
+    .file.active{
+      background: rgba(253,186,45,.15);
+      border-color: rgba(253,186,45,.28);
+    }
+    .file .dot{
+      width:10px; height:10px; border-radius:999px;
+      background: rgba(253,186,45,.70);
+    }
+
+    /* Main workspace */
+    .workspace{
+      display:flex;
+      flex-direction:column;
+      min-width: 0;
+      background: rgba(255,255,255,.35);
+    }
+
+    .ws-header{
+      height:46px;
+      border-bottom:1px solid var(--stroke);
+      background: rgba(255,255,255,.60);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding: 0 12px;
+      gap: 12px;
+      flex:0 0 auto;
+    }
+    .tabs{ display:flex; align-items:center; gap:8px; min-width: 0; }
+    .tab{
+      display:flex; align-items:center; gap:8px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: rgba(11,60,93,.06);
+      border: 1px solid rgba(11,60,93,.12);
+      font-weight:900;
+      font-size:13px;
+      color: var(--navy);
+      min-width: 0;
+    }
+    .tab .x{ opacity:.55; font-weight:900; }
+    .ws-right{
+      display:flex; align-items:center; gap:10px;
+      color: rgba(11,60,93,.75);
+      font-weight:900;
+      font-size:12px;
+      letter-spacing: .35px;
+    }
+
+    /* Editor */
+    .editor-wrap{
+      position:relative;
+      background: var(--editor);
+      flex: 1 1 auto;
+      min-height: 0;
+    }
+    .editor{
+      width:100%;
+      height:100%;
+      padding: 14px 14px 14px 52px;
+      border:0;
+      outline:none;
+      resize:none;
+      background: transparent;
+      color: rgba(233,238,247,.95);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 14px;
+      line-height: 1.6;
+      tab-size: 2;
+    }
+    .gutter{
+      position:absolute;
+      left:0; top:0; bottom:0;
+      width:44px;
+      border-right:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.04);
+      color: rgba(233,238,247,.45);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 13px;
+      padding-top: 14px;
+      text-align:right;
+      padding-right: 10px;
+      user-select:none;
+      overflow:hidden;
+    }
+    .gutter div{ height: 22px; }
+
+    /* Console (resizable) */
+    .console{
+      background: var(--console);
+      border-top: 1px solid rgba(255,255,255,.10);
+      height: 220px;
+      min-height: 140px;
+      max-height: 60vh;
+      resize: vertical;
+      overflow: auto;
+      flex: 0 0 auto;
+      display:flex;
+      flex-direction:column;
+    }
+    .console-head{
+      flex: 0 0 auto;
+      height:38px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding: 0 12px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      color: rgba(233,238,247,.78);
+      font-weight:900;
+      font-size: 12px;
+      letter-spacing: .35px;
+      user-select:none;
+    }
+    .console-body{
+      flex: 1 1 auto;
+      padding: 10px 12px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 13px;
+      color: rgba(233,238,247,.92);
+      overflow:auto;
+      white-space: pre-wrap;
+      margin:0;
+    }
+    .console-tools button{
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.12);
+      color: rgba(233,238,247,.90);
+      border-radius: 10px;
+      padding: 7px 10px;
+      font-weight: 900;
+      cursor:pointer;
+    }
+
+    /* Console tabs */
+    .console-tabs{
+      display:flex;
+      gap:4px;
+    }
+    .console-tab{
+      background:none;
+      border:none;
+      color: rgba(233,238,247,.55);
+      font-family:inherit;
+      font-size:11px;
+      font-weight:900;
+      letter-spacing:.4px;
+      padding:0 10px;
+      cursor:pointer;
+      border-bottom: 2px solid transparent;
+      height:100%;
+    }
+    .console-tab.active{
+      color: rgba(233,238,247,.92);
+      border-bottom-color: var(--yellow);
+    }
+
+    /* Test cases pane */
+    .console-testcases{
+      flex:1 1 auto;
+      overflow:auto;
+    }
+    .tc-split{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      height:100%;
+    }
+    .tc-col{
+      padding:10px 12px;
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+    }
+    .tc-col.tc-expected{
+      border-left:1px solid rgba(255,255,255,.08);
+    }
+    .tc-label{
+      font-size:11px;
+      font-weight:900;
+      letter-spacing:.4px;
+      color: rgba(233,238,247,.55);
+      text-transform:uppercase;
+    }
+    .tc-label-row{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:8px;
+    }
+    .tc-output{
+      flex:1;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Courier New", monospace;
+      font-size:13px;
+      color: rgba(233,238,247,.88);
+      margin:0;
+      white-space:pre-wrap;
+      line-height:1.6;
+    }
+    /* toggle switch */
+    .tc-toggle{
+      display:flex; align-items:center; cursor:pointer;
+    }
+    .tc-toggle input{ display:none; }
+    .tc-slider{
+      width:28px; height:14px;
+      border-radius:999px;
+      background: rgba(255,255,255,.15);
+      border:1px solid rgba(255,255,255,.18);
+      position:relative;
+      transition: background .2s;
+    }
+    .tc-slider::after{
+      content:"";
+      position:absolute;
+      width:10px; height:10px;
+      border-radius:50%;
+      background:#fff;
+      top:1px; left:2px;
+      transition: transform .2s;
+    }
+    .tc-toggle input:checked + .tc-slider{ background: rgba(29,108,200,.7); }
+    .tc-toggle input:checked + .tc-slider::after{ transform:translateX(13px); }
+
+    
+    @media (max-width: 980px){
+      body{ overflow:auto; }
+      .app{
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto auto;
+        height:auto;
+      }
+      .iconbar{ display:none; }
+      .sidepanels{
+        display:flex;
+        flex-direction:row;
+        flex-wrap:wrap;
+        border-right:none;
+        border-bottom:1px solid var(--stroke);
+        overflow:visible;
+      }
+      .panel-block{ flex:1 1 220px; }
+      .workspace{ min-height:520px; }
+      .console{ height:160px; }
+      .top-actions .kbd{ display:none; }
+    }
+    @media (max-width:560px){
+      .top-actions .pill{ display:none; }
+      .btn{ padding:8px 10px; font-size:13px; }
+    }
+  </style>
+</head>
+
+<body>
+  <a class="skip-link" href="#workspace">Skip to workspace</a>
+
+  <!-- TOP BAR -->
+  <header class="topbar">
+    <a class="brand" href="index.html" aria-label="HelloPy Home">
+      <div class="logo-badge">
+        <img src="py-mascot.png" alt="HelloPy Snake Mascot" class="logo-mark" />
+        <div class="logo-text">Hello<span>Py</span></div>
+        <div class="brand-sub" id="weekSub">Week 4 • Workspace</div>
+      </div>
+    </a>
+
+    <div class="top-actions">
+      <div class="pill" aria-label="Page type">Workspace</div>
+      <button class="btn btn-ask" id="askAiBtn" type="button" aria-label="Ask AI">🤖 Ask AI ?</button>
+      <button class="btn btn-run" id="runBtn" type="button" aria-label="Run code">▶ Run Code</button>
+      <span class="kbd" aria-hidden="true">Ctrl/⌘ + Enter</span>
+
+      <!-- NEXT BUTTON -->
+      <a class="btn" href="week4-tryit.html" aria-label="Go to Week 1 Try It">
+        Next →
+      </a>
+    </div>
+  </header>
+
+  <div class="app" id="workspace">
+    <!-- ICON BAR -->
+    <aside class="iconbar" aria-label="Sidebar">
+      <div class="ic active" title="Undo">↺</div>
+      <div class="ic" title="Files">🗂</div>
+      <div class="ic" title="Docs">📄</div>
+      <div class="ic" title="Settings">⚙</div>
+      <div class="spacer"></div>
+      <div class="ic" title="Help">?</div>
+    </aside>
+
+    <!-- LEFT PANELS -->
+    <aside class="sidepanels" aria-label="Week panel">
+      <div class="side-header">
+        <div class="side-title">Strings</div>
+        <div class="chip">Week 4</div>
+      </div>
+
+      <div class="panel-block">
+        <div class="section-title">
+          <h2>💬 What is a String?</h2>
+          <div class="section-actions">
+            <button class="tag-btn" type="button" id="tldrBtn">TL;DR</button>
+            <button class="tag-btn" type="button" id="hideBtn">Hide</button>
+          </div>
+        </div>
+        <p class="lang-desc" id="langDesc">
+          A <strong>string</strong> is any text wrapped in quotes. You can join strings together using <strong>+</strong>, and use them to create messages, quotes, or silly sentences!
+        </p>
+      </div>
+
+      <div class="challenge-section">
+        <div class="challenge-head">
+          <h2>💡 Challenge</h2>
+        </div>
+        <p class="challenge-desc">
+          Use strings to create your own fun message, favorite quote, or silly sentence!
+        </p>
+        <div class="what-to-do">What to do:</div>
+        <ol class="step-list">
+          <li>
+            <span class="step-num">1</span>
+            <span>Store a string: <span class="step-code">message = "Hello World!"</span></span>
+          </li>
+          <li>
+            <span class="step-num">2</span>
+            <span>Join strings with <span class="step-code">+</span>: <span class="step-code">print("Hi " + "Py!")</span></span>
+          </li>
+          <li>
+            <span class="step-num">3</span>
+            <span>Write your own fun message or silly sentence!</span>
+          </li>
+        </ol>
+        <button class="explain-btn" type="button" id="explainBtn">📋 Explain challenge</button>
+      </div>
+
+      <div class="solution-section">
+        <div class="solution-head">
+          <h2>⚙ Solution</h2>
+        </div>
+        <button class="solution-toggle" id="solutionToggle" type="button" aria-expanded="false">
+          <span>Solution</span>
+          <span class="solution-arrow">›</span>
+        </button>
+        <div class="solution-body" id="solutionBody">message = "Python is awesome!"
+quote = "Keep coding and never give up!"
+silly = "My cat " + "loves " + "pizza!"
+
+print(message)
+print(quote)
+print(silly)</div>
+      </div>
+    </aside>
+
+    <!-- MAIN WORKSPACE -->
+    <main class="workspace" aria-label="Main workspace">
+      <div class="ws-header">
+        <div class="tabs">
+          <div class="tab">
+            <span style="opacity:.9;" aria-hidden="true">🐍</span>
+            <span id="tabName">main.py</span>
+            <span class="x" aria-hidden="true">×</span>
+          </div>
+        </div>
+        <div class="ws-right">WORKSPACE</div>
+      </div>
+
+      <!-- EDITOR -->
+      <section class="editor-wrap" aria-label="Editor">
+        <div class="gutter" id="gutter" aria-hidden="true"></div>
+        <textarea class="editor" id="code" spellcheck="false" aria-label="Python code editor">message = "Hello World!"
+print(message)</textarea>
+      </section>
+
+      <!-- CONSOLE (Resizable) -->
+      <section class="console" aria-label="Console" title="Drag the bottom-right corner to resize">
+        <div class="console-head">
+          <div style="color:rgba(233,238,247,.78); font-weight:900; font-size:12px; letter-spacing:.35px;">CONSOLE</div>
+          <div class="console-tools">
+            <button type="button" id="clearBtn">Clear</button>
+          </div>
+        </div>
+        <pre class="console-body" id="output">Ready! Click Run ▶ (Tip: Ctrl/⌘ + Enter)</pre>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    // ====== WEEK CONFIG ======
+    const WEEK_CONFIG = {
+      week: 4,
+      fileName: "main.py",
+      starterCode: 'message = "Hello World!"\nprint(message)',
+      goalText: 'Use <b>strings</b> to create fun messages! Try joining them with <b>+</b>.'
+    };
+
+    // Apply config to UI
+    window.addEventListener("DOMContentLoaded", () => {
+      const sub = document.getElementById("weekSub");
+      if (sub) sub.textContent = `Week ${WEEK_CONFIG.week} • Workspace`;
+
+      const codeEl = document.getElementById("code");
+      if (codeEl) { codeEl.value = WEEK_CONFIG.starterCode; if (typeof cm !== 'undefined') cm.setValue(WEEK_CONFIG.starterCode); }
+
+      // File name in sidebar + tab
+      const fileMain = document.getElementById("fileMain");
+      if (fileMain) fileMain.querySelector("span:last-child").textContent = WEEK_CONFIG.fileName;
+
+      const tabName = document.getElementById("tabName");
+      if (tabName) tabName.textContent = WEEK_CONFIG.fileName;
+
+      // Goal text
+      const goalBox = document.getElementById("goalText");
+      if (goalBox) goalBox.innerHTML = WEEK_CONFIG.goalText;
+
+      // Logo pop-in
+      const badge = document.querySelector('.logo-badge');
+      if (badge) badge.classList.add('pop-in');
+
+      // Refresh gutter
+      if (typeof renderGutter === "function") renderGutter();
+    });
+
+    // Logo wiggle on click (same behavior as index)
+    const brand = document.querySelector('.brand');
+    const mark = document.querySelector('.logo-mark');
+
+    brand.addEventListener('click', (e) => {
+      e.preventDefault();
+      mark.classList.add('wiggle');
+      setTimeout(() => mark.classList.remove('wiggle'), 500);
+      window.location.href = brand.getAttribute('href');
+    });
+  </script>
+
+  <!-- CodeMirror 5 syntax highlighting -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/lib/codemirror.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/theme/dracula.min.css">
+  <style>
+    .CodeMirror{ height:100% !important; font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Courier New",monospace !important; font-size:14px !important; line-height:1.6 !important; background:#0f2237 !important; border:none !important; box-shadow:none !important; border-radius:0 !important; }
+    .CodeMirror-scroll{ min-height:100%; }
+    #code{ display:none !important; }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/lib/codemirror.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/mode/python/python.min.js"></script>
+  <!-- Skulpt (run Python in browser) -->
+  <script src="https://cdn.jsdelivr.net/npm/skulpt@1.2.0/dist/skulpt.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/skulpt@1.2.0/dist/skulpt-stdlib.js"></script>
+
+  <script>
+    // --- CodeMirror editor
+    const codeEl = document.getElementById('code');
+    const gutter = document.getElementById('gutter');
+    if (gutter) gutter.style.display = 'none';
+
+    function renderGutter(){ /* no-op: CM handles line numbers */ }
+
+    const cm = CodeMirror.fromTextArea(codeEl, {
+      mode: 'python',
+      theme: 'dracula',
+      lineNumbers: true,
+      indentUnit: 4,
+      tabSize: 4,
+      indentWithTabs: false,
+      extraKeys: {
+        'Ctrl-Enter': () => runCode(),
+        'Cmd-Enter':  () => runCode(),
+        'Tab': (cm) => cm.replaceSelection('    ')
+      }
+    });
+    cm.on('change', () => { codeEl.value = cm.getValue(); });
+
+    // --- Console helpers
+    const outEl = document.getElementById('output');
+
+    function write(text){
+      outEl.textContent += text;
+    }
+
+    document.getElementById('clearBtn').addEventListener('click', () => {
+      outEl.textContent = 'Cleared. Click Run ▶';
+    });
+
+    // --- Run Python using Skulpt
+    function builtinRead(x){
+      if (Sk.builtinFiles === undefined || Sk.builtinFiles["files"][x] === undefined)
+        throw "File not found: '" + x + "'";
+      return Sk.builtinFiles["files"][x];
+    }
+
+    async function runCode(){
+      codeEl.value = cm.getValue();
+      const code = codeEl.value;
+      outEl.textContent = `RUN AT ${new Date().toLocaleTimeString()}\n---------------------------\n`;
+
+      Sk.configure({
+        output: (text) => write(text),
+        read: builtinRead
+      });
+
+      try{
+        await Sk.misceval.asyncToPromise(() =>
+          Sk.importMainWithBody("<stdin>", false, code, true)
+        );
+      }catch(err){
+        write("\n\nError: " + err.toString());
+      }
+    }
+
+    document.getElementById('runBtn').addEventListener('click', runCode);
+
+    // CTRL/CMD + Enter runs
+    document.addEventListener('keydown', (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') runCode();
+    });
+
+    // Solution toggle
+    const solutionToggle = document.getElementById('solutionToggle');
+    const solutionBody = document.getElementById('solutionBody');
+    solutionToggle.addEventListener('click', () => {
+      const open = solutionBody.classList.toggle('open');
+      solutionToggle.classList.toggle('open', open);
+      solutionToggle.setAttribute('aria-expanded', String(open));
+    });
+
+    // TL;DR toggle
+    document.getElementById('tldrBtn').addEventListener('click', () => {
+      const d = document.getElementById('langDesc');
+      const isTldr = d.dataset.tldr === '1';
+      if (!isTldr) {
+        d.dataset.full = d.innerHTML;
+        d.innerHTML = '<strong>String</strong> = text in quotes. Join with <strong>+</strong>. Example: "Hello " + "Py!"';
+        d.dataset.tldr = '1';
+      } else {
+        d.innerHTML = d.dataset.full;
+        d.dataset.tldr = '0';
+      }
+    });
+
+    // Hide toggle
+    document.getElementById('hideBtn').addEventListener('click', () => {
+      const d = document.getElementById('langDesc');
+      d.style.display = d.style.display === 'none' ? '' : 'none';
+    });
+
+    // Explain challenge
+    document.getElementById('explainBtn').addEventListener('click', () => {
+      const out = document.getElementById('output');
+      out.textContent = 'Challenge Explained:\n---------------------------\nA string is text inside quotes.\n\nExamples:\n  message = "Hello!"     → stores a string\n  print(message)         → outputs: Hello!\n  print("Hi " + "Py!")  → outputs: Hi Py!\n\nYou can join strings with + and store them in variables!';
+    });
+
+    // Ask AI
+    document.getElementById('askAiBtn').addEventListener('click', () => {
+      const out = document.getElementById('output');
+      out.textContent = '🤖 AI Hint:\n---------------------------\nStrings are text inside quotes:\n  message = "Hello!"     → stores text\n  print(message)         → Hello!\n  print("Hi " + "Py!")  → Hi Py!\n\nYou can also use .upper() or .lower():\n  print("hello".upper()) → HELLO';
+    });
+  </script>
+</body>
+</html>

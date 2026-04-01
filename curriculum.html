@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HelloPy | Curriculum</title>
+
+  <!-- Fonts (HelloPy) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Rubik+Bubbles&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --navy:#0B3C5D;
+      --navy2:#082E46;
+      --yellow:#FDBA2D;
+
+      /* ✅ Brand helpers (replaces all purple) */
+      --brandBlue: var(--navy);
+      --brandBlueSoft: rgba(11,60,93,.12);
+      --brandBlueBorder: rgba(11,60,93,.22);
+
+      --ink:#0E1726;
+      --muted:#5A6B7A;
+      --bg:#FBFCFF;
+      --card:#ffffff;
+      --stroke: rgba(11,60,93,.10);
+      --shadow: 0 14px 34px rgba(0,0,0,.10);
+      --shadowSoft: 0 10px 24px rgba(0,0,0,.08);
+      --r12: 12px;
+      --r16: 16px;
+      --r20: 20px;
+      --r24: 24px;
+      --max: 1140px;
+    }
+
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
+    body{
+      margin:0;
+      font-family:Poppins, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color:var(--ink);
+      background:
+        radial-gradient(800px 480px at 15% 0%, rgba(253,186,45,.18), transparent 60%),
+        radial-gradient(900px 520px at 85% 5%, rgba(11,60,93,.10), transparent 60%),
+        linear-gradient(180deg, #ffffff, var(--bg));
+      overflow-x:hidden;
+    }
+
+
+    /* Per-week completion badges */
+    .week-card{ position:relative; transition: box-shadow .2s ease; }
+    .week-card:hover{ box-shadow: 0 16px 32px rgba(0,0,0,.10); }
+    .wk-done-badge{
+      display:none;
+      position:absolute;
+      top:12px; right:56px;
+      width:26px; height:26px;
+      border-radius:50%;
+      background: rgba(40,199,111,.18);
+      border: 1.5px solid rgba(40,199,111,.45);
+      align-items:center; justify-content:center;
+      font-size:13px;
+    }
+    .week-card.completed .wk-done-badge{ display:flex; }
+    .week-card.completed{ border-color: rgba(40,199,111,.30); background: rgba(240,255,246,.6); }
+    .week-card.completed .wk-icon{ background: rgba(40,199,111,.14); border-color: rgba(40,199,111,.25); }
+
+    /* -------- NAV -------- */
+    .nav{
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(255,255,255,.88);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(11,60,93,.08);
+    }
+    .nav-inner{
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 22px 24px;
+      display:flex;
+      align-items:center;
+      justify-content: space-between;
+      gap: 14px;
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:14px;
+      text-decoration:none;
+    }
+
+    .logo-badge{
+      display:flex;
+      align-items:center;
+      gap:18px;
+      padding: 10px 0;
+      position: relative;
+    }
+
+    .logo-mark{
+      width: 60px;
+      height: auto;
+      display:block;
+      transition: transform .25s ease;
+    }
+
+    .brand:hover .logo-mark{
+      transform: translateY(-6px) rotate(-6deg);
+    }
+
+    .logo-text{
+      font-family: Poppins, system-ui;
+      font-weight: 900;
+      font-size: 32px;
+      color: var(--navy);
+      letter-spacing: -.8px;
+      position: relative;
+      display:inline-block;
+    }
+
+    .logo-text span{
+      color: var(--yellow);
+      display:inline-block;
+      transform: translateY(-4px);
+      border-radius: 10px;
+    }
+
+    .logo-text::after{
+      content:"";
+      position:absolute;
+      left:0;
+      bottom:-8px;
+      width:100%;
+      height:8px;
+      background: rgba(253,186,45,.45);
+      border-radius: 10px;
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform .25s ease;
+    }
+
+    .brand:hover .logo-text::after{
+      transform: scaleX(1);
+    }
+
+    @keyframes wiggle {
+      0% { transform: rotate(0deg); }
+      25% { transform: rotate(-6deg); }
+      50% { transform: rotate(6deg); }
+      75% { transform: rotate(-4deg); }
+      100% { transform: rotate(0deg); }
+    }
+
+    .wiggle {
+      animation: wiggle .5s ease;
+    }
+
+    .logo-mini{ display:none; }
+
+    @keyframes popIn {
+      0% { transform: scale(.92); opacity: 0; }
+      70% { transform: scale(1.02); opacity: 1; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .logo-badge.pop-in{
+      animation: popIn .55s ease-out both;
+    }
+
+    @media (max-width: 560px){
+      .logo-text{ font-size: 22px; }
+      .logo-mark{ width:32px; height:32px; border-radius: 12px; }
+      .logo-badge{ gap: 14px; }
+    }
+
+    /* Old logo/text styles — kept for compatibility */
+    .logo-box{ display:none; }
+    .brand-stack{ display:none; }
+
+    .nav-links{
+      display:flex;
+      align-items:center;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content:flex-end;
+    }
+    .link{
+      text-decoration:none;
+      color: var(--navy);
+      font-weight: 700;
+      font-size: 14px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      transition: .16s ease;
+    }
+    .link:hover{ background: rgba(11,60,93,.06); }
+
+    .btn{
+      border: 0;
+      cursor:pointer;
+      font-family: inherit;
+      font-weight: 900;
+      padding: 10px 14px;
+      border-radius: 14px;
+      transition: .16s ease;
+      display:inline-flex;
+      align-items:center;
+      gap: 8px;
+      text-decoration:none;
+      white-space: nowrap;
+    }
+    .btn-primary{
+      background: var(--yellow);
+      color: #2A1C00;
+      box-shadow: 0 14px 26px rgba(253,186,45,.30);
+    }
+    .btn-primary:hover{ transform: translateY(-1px); }
+    .btn-ghost{
+      background: rgba(11,60,93,.08);
+      color: var(--navy);
+    }
+    .btn-ghost:hover{ background: rgba(11,60,93,.12); }
+
+    /* Dropdown */
+    .dropdown{ position:relative; }
+    .dropdown-menu{
+      position:absolute;
+      right:0;
+      top:46px;
+      width: 240px;
+      background: #fff;
+      border-radius: 16px;
+      border: 1px solid rgba(11,60,93,.10);
+      box-shadow: var(--shadowSoft);
+      padding: 8px;
+      display:none;
+      overflow:hidden;
+    }
+    .dropdown.open .dropdown-menu{ display:block; }
+    .dropdown-menu a{
+      display:flex;
+      justify-content: space-between;
+      align-items:center;
+      text-decoration:none;
+      color: var(--ink);
+      font-size: 14px;
+      font-weight: 700;
+      padding: 10px 12px;
+      border-radius: 12px;
+      transition: .14s ease;
+    }
+    .dropdown-menu a span{ color: var(--muted); font-size: 12px; font-weight: 700; }
+    .dropdown-menu a:hover{ background: rgba(253,186,45,.22); }
+
+    /* -------- PAGE HEADER -------- */
+    .wrap{ max-width: var(--max); margin: 0 auto; padding: 0 18px; }
+
+    .page-hero{
+      padding: 44px 0 26px;
+      text-align:center;
+    }
+    .kicker{
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(253,186,45,.16);
+      border: 1px solid rgba(253,186,45,.35);
+      color: var(--navy);
+      font-weight: 900;
+      font-size: 12px;
+      letter-spacing: .2px;
+    }
+    h1{
+      margin: 18px 0 8px;
+      font-size: clamp(34px, 4.2vw, 52px);
+      line-height: 1.08;
+      letter-spacing: -.8px;
+      color: var(--ink);
+    }
+    .accent2{ color: var(--brandBlue); }
+
+    .subtitle{
+      margin: 0 auto;
+      max-width: 70ch;
+      color: var(--muted);
+      font-weight: 600;
+      line-height: 1.7;
+    }
+
+    /* -------- MAIN GRID -------- */
+    .grid{
+      display:grid;
+      grid-template-columns: 1fr 360px;
+      gap: 22px;
+      padding: 18px 0 70px;
+      align-items:start;
+    }
+
+    /* Week list */
+    .week-list{ display:grid; gap: 16px; }
+
+    .week-card{
+      background: var(--card);
+      border: 1px solid var(--stroke);
+      border-radius: 20px;
+      box-shadow: 0 10px 22px rgba(0,0,0,.06);
+      padding: 18px;
+      display:grid;
+      grid-template-columns: 52px 1fr 44px;
+      gap: 14px;
+      align-items:start;
+    }
+    .wk-icon{
+      width:52px;
+      height:52px;
+      border-radius: 16px;
+      display:grid;
+      place-items:center;
+      font-size: 22px;
+      background: rgba(11,60,93,.06);
+      border: 1px solid rgba(11,60,93,.10);
+    }
+
+    .wk-meta{
+      font-size: 12px;
+      font-weight: 900;
+      color: var(--muted);
+      letter-spacing: .2px;
+    }
+    .wk-title{
+      margin: 2px 0 6px;
+      font-size: 18px;
+      letter-spacing: -.2px;
+      font-weight: 900;
+      color: var(--ink);
+    }
+    .wk-desc{
+      margin: 0 0 12px;
+      color: var(--muted);
+      font-weight: 600;
+      line-height: 1.55;
+      font-size: 13px;
+      max-width: 70ch;
+    }
+
+    .tags{ display:flex; flex-wrap:wrap; gap: 8px; }
+    .tag{
+      font-size: 11px;
+      font-weight: 900;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(11,60,93,.10);
+      background: rgba(11,60,93,.05);
+      color: var(--navy);
+      letter-spacing: .2px;
+    }
+    .tag.green{
+      background: rgba(40,199,111,.14);
+      border-color: rgba(40,199,111,.30);
+      color: #0b7a42;
+    }
+    .tag.blue{
+      background: var(--brandBlueSoft);
+      border-color: var(--brandBlueBorder);
+      color: var(--brandBlue);
+    }
+
+    .go{
+      width: 44px;
+      height: 44px;
+      border-radius: 999px;
+      display:grid;
+      place-items:center;
+      border: 1px solid var(--brandBlueBorder);
+      background: var(--brandBlueSoft);
+      box-shadow: 0 10px 18px rgba(11,60,93,.14);
+      color: var(--brandBlue);
+      text-decoration:none;
+      font-weight: 900;
+      transition: .16s ease;
+    }
+    .go:hover{ transform: translateY(-1px); }
+
+    /* -------- SIDEBAR -------- */
+    .sidebar{
+      position: sticky;
+      top: 92px;
+      display:grid;
+      gap: 16px;
+    }
+
+    .panel{
+      background: var(--card);
+      border: 1px solid var(--stroke);
+      border-radius: 22px;
+      box-shadow: var(--shadowSoft);
+      padding: 16px;
+    }
+
+    .panel-head{
+      display:flex;
+      align-items:center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .panel-title{ font-weight: 900; letter-spacing: -.2px; }
+
+    .progress-num{
+      font-weight: 900;
+      color: var(--brandBlue);
+      font-size: 22px;
+      letter-spacing: -.5px;
+    }
+
+    .bar{
+      height: 10px;
+      border-radius: 999px;
+      background: rgba(11,60,93,.08);
+      overflow:hidden;
+      border: 1px solid rgba(11,60,93,.10);
+    }
+    .bar > div{
+      height:100%;
+      width: 0%;
+      background: linear-gradient(90deg, rgba(11,60,93,.92), rgba(253,186,45,.95));
+      border-radius: 999px;
+      transition: width .25s ease;
+    }
+
+    .milestones{
+      display:grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-top: 12px;
+    }
+    .mile{
+      text-align:center;
+      opacity: .45;
+      transition: opacity .2s ease;
+    }
+    .mile.on{ opacity: 1; }
+    .m-ic{
+      width:44px;
+      height:44px;
+      border-radius: 16px;
+      display:grid;
+      place-items:center;
+      margin: 0 auto 6px;
+      background: rgba(11,60,93,.06);
+      border: 1px solid rgba(11,60,93,.10);
+      font-weight: 900;
+    }
+    .mile small{
+      display:block;
+      font-weight: 900;
+      font-size: 10px;
+      color: var(--muted);
+      line-height:1.2;
+    }
+
+    .tip{
+      display:flex;
+      gap: 12px;
+      align-items:flex-start;
+    }
+    .bulb{
+      width: 34px;
+      height: 34px;
+      border-radius: 14px;
+      display:grid;
+      place-items:center;
+      background: rgba(253,186,45,.22);
+      border: 1px solid rgba(253,186,45,.35);
+      flex:0 0 auto;
+    }
+    .tip p{
+      margin: 0;
+      color: var(--muted);
+      font-weight: 650;
+      line-height: 1.55;
+      font-size: 13px;
+    }
+
+    .need-list{ display:grid; gap: 10px; margin-top: 8px; }
+    .need{
+      display:flex;
+      gap: 10px;
+      align-items:flex-start;
+      font-weight: 750;
+      color: var(--ink);
+    }
+    .need .dot{
+      width: 22px;
+      height: 22px;
+      border-radius: 999px;
+      display:grid;
+      place-items:center;
+      background: rgba(11,60,93,.06);
+      border: 1px solid rgba(11,60,93,.10);
+      color: var(--navy);
+      font-weight: 900;
+      flex: 0 0 auto;
+      margin-top: 1px;
+      font-size: 12px;
+    }
+    .need span{ color: var(--muted); font-weight: 700; }
+
+    /* -------- RESPONSIVE -------- */
+    @media (max-width: 980px){
+      .grid{ grid-template-columns: 1fr; }
+      .sidebar{ position: static; }
+    }
+    @media (max-width: 560px){
+      .week-card{ grid-template-columns: 52px 1fr; }
+      .go{ display:none; }
+      .milestones{ grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- NAV -->
+  <header class="nav">
+    <div class="nav-inner">
+      <a class="brand" href="index.html" aria-label="HelloPy Home">
+        <div class="logo-badge">
+          <img src="py-mascot.png" alt="HelloPy Snake Mascot" class="logo-mark" />
+          <div class="logo-text">Hello<span>Py</span></div>
+        </div>
+      </a>
+
+      <nav class="nav-links">
+        <a class="link" href="index.html#why">Why Learn</a>
+        <a class="link" href="index.html#journey">Journey</a>
+        <a class="link" href="index.html#skills">Skills</a>
+
+        <div class="dropdown" id="weeksDropdown">
+          <button class="btn btn-ghost" type="button" id="weeksBtn" aria-haspopup="true" aria-expanded="false">Weeks ▾</button>
+          <div class="dropdown-menu" role="menu" aria-label="Weeks menu">
+            <a href="week1.html">Week 1 <span>Hello Python</span></a>
+            <a href="week2.html">Week 2 <span>Variables</span></a>
+            <a href="week3.html">Week 3 <span>Math</span></a>
+            <a href="week4.html">Week 4 <span>Strings</span></a>
+            <a href="week5.html">Week 5 <span>Input</span></a>
+            <a href="week6.html">Week 6 <span>If Statements</span></a>
+            <a href="week7.html">Week 7 <span>Loops</span></a>
+            <a href="week8.html">Week 8 <span>Lists</span></a>
+            <a href="week9.html">Week 9 <span>Loops + Lists</span></a>
+            <a href="week10.html">Week 10 <span>Functions</span></a>
+            <a href="week11.html">Week 11 <span>Mini Game</span></a>
+            <a href="week12.html">Week 12 <span>Final Project</span></a>
+          </div>
+        </div>
+
+        <a class="btn btn-primary" href="week1.html">Start Learning →</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- PAGE HEADER -->
+  <section class="page-hero">
+    <div class="wrap">
+      <div class="kicker">📘 12-Week Python Course</div>
+      <h1>Your Learning <span class="accent2">Journey</span></h1>
+      <p class="subtitle">Follow along week by week and become a Python programming pro! Each lesson builds on the last. 🚀</p>
+    </div>
+  </section>
+
+  <!-- MAIN -->
+  <main class="wrap">
+    <div class="grid">
+      <!-- LEFT: WEEK CARDS -->
+      <section class="week-list" aria-label="Curriculum list">
+
+        <!-- Week 1 -->
+        <article class="week-card" data-week="1"><span class="wk-done-badge" aria-label="Completed">✓</span>
+          <div class="wk-icon">👋</div>
+          <div>
+            <div class="wk-meta">Week 1</div>
+            <div class="wk-title">Hello, Python!</div>
+            <p class="wk-desc">Meet Python and write your very first lines of code. Learn how to make the computer talk!</p>
+            <div class="tags">
+              <span class="tag green">beginner</span>
+              <span class="tag blue">print()</span>
+              <span class="tag blue">strings</span>
+              <span class="tag blue">running code</span>
+            </div>
+          </div>
+          <a class="go" href="week1.html" aria-label="Go to Week 1">›</a>
+        </article>
+
+        <!-- Week 2 -->
+        <article class="week-card" data-week="2"><span class="wk-done-badge" aria-label="Completed">✓</span>
+          <div class="wk-icon">📦</div>
+          <div>
+            <div class="wk-meta">Week 2</div>
+            <div class="wk-title">Variables — Your Coding Backpack</div>
+            <p class="wk-desc">Create variables to store your name, favorite color, food, and dream job. Tell Py about yourself!</p>
+            <div class="tags">
+              <span class="tag green">beginner</span>
+              <span class="tag blue">variables</span>
+              <span class="tag blue">assignment =</span>
+              <span class="tag blue">data types</span>
+            </div>
+          </div>
+          <a class="go" href="week2.html" aria-label="Go to Week 2">›</a>
+        </article>
+
+        <!-- Week 3 -->
+        <article class="week-card" data-week="3"><span class="wk-done-badge" aria-label="Completed">✓</span>
+          <div class="wk-icon">🔢</div>
+          <div>
+            <div class="wk-meta">Week 3</div>
+            <div class="wk-title">Numbers & Math Magic</div>
+            <p class="wk-desc">Help Py use Python to add, subtract, multiply, and divide numbers like a calculator!</p>
+            <div class="tags">
+              <span class="tag blue">+ - * /</span>
+              <span class="tag blue">numbers</span>
+              <span class="tag blue">math</span>
+              <span class="tag blue">operators</span>
+            </div>
+          </div>
+          <a class="go" href="week3.html" aria-label="Go to Week 3">›</a>
+        </article>
+
+        <!-- Week 4 -->
+        <article class="week-card" data-week="4"><span class="wk-done-badge" aria-label="Completed">✓</span>
+          <div class="wk-icon">💬</div>
+          <div>
+            <div class="wk-meta">Week 4</div>
+            <div class="wk-title">Strings — Words Have Power</div>
+            <p class="wk-desc">Use strings to create your own fun message, favorite quote, or silly sentence using +!</p>
+            <div class="tags">
+              <span class="tag blue">strings</span>
+              <span class="tag blue">concatenation</span>
+              <span class="tag blue">quotes</span>
+              <span class="tag blue">text</span>
+            </div>
+          </div>
+          <a class="go" href="week4.html" aria-label="Go to Week 4">›</a>
+        </article>
+
+        <!-- Week 5 -->
+        <article class="week-card" data-week="5"><span class="wk-done-badge" aria-label="Completed">✓</span>
+          <div class="wk-icon">🎤</div>
+          <div>
+            <div class="wk-meta">Week 5</div>
+            <div class="wk-title">Input — Talk Back to the Computer</div>
+            <p class="wk-desc">Write a program that asks the user their name and favorite animal, then responds back!</p>
+            <div class="tags">
+              <span class="tag blue">input()</span>
+              <span class="tag blue">user interaction</span>
+              <span class="tag blue">strings</span>
+              <span class="tag blue">interactive</span>
+            </div>
+          </div>
+          <a class="go" href="week5.html" aria-label="Go to Week 5">›</a>
+        </article>
+
+        <!-- Week 6 -->
+        <article class="week-card" data-week="6"><span class="wk-done-badge" aria-label="Completed">✓</span>
+          <div class="wk-icon">🔀</div>
+          <div>
+            <div class="wk-meta">Week 6</div>
+            <div class="wk-title">If Statements — Choose Your Path</div>
+            <p class="wk-desc">Use if statements to help Py make decisions based on the user's answer. Add else too!</p>
+            <div class="tags">
+              <span class="tag blue">if</span>
+              <span class="tag blue">else</span>
+              <span class="tag blue">elif</span>
+              <span class="tag blue">conditions</span>
+            </div>
+          </div>
+          <a class="go" href="week6.html" aria-label="Go to Week 6">›</a>
+        </article>
+
+        <!-- Week 7 -->
+        <article class="week-card" data-week="7"><span class="wk-done-badge" aria-label="Completed">✓</span>
+          <div class="wk-icon">🔁</div>
+          <div>
+            <div class="wk-meta">Week 7</div>
+            <div class="wk-title">Loops — Repeat the Fun</div>
+            <p class="wk-desc">Use loops to repeat words, count numbers, or print a cheer multiple times without rewriting code!</p>
+            <div class="tags">
+              <span class="tag blue">for</span>
+              <span class="tag blue">range()</span>
+              <span class="tag blue">repeat</span>
+              <span class="tag blue">countdown</span>
+            </div>
+          </div>
+          <a class="go" href="week7.html" aria-label="Go to Week 7">›</a>
+        </article>
+
+        <!-- Week 8 -->
+        <article class="week-card" data-week="8"><span class="wk-done-badge" aria-label="Completed">✓</span>
+          <div class="wk-icon">📋</div>
+          <div>
+            <div class="wk-meta">Week 8</div>
+            <div class="wk-title">Lists — Pack the Adventure Bag</div>
+            <p class="wk-desc">Make a list of items Py should bring and print them out. Use index, len(), and append()!</p>
+            <div class="tags">
+              <span class="tag blue">lists [ ]</span>
+              <span class="tag blue">index</span>
+              <span class="tag blue">len()</span>
+              <span class="tag blue">append()</span>
+            </div>
+          </div>
+          <a class="go" href="week8.html" aria-label="Go to Week 8">›</a>
+        </article>
+
+        <!-- Week 9 -->
+        <article class="week-card" data-week="9"><span class="wk-done-badge" aria-label="Completed">✓</span>
+          <div class="wk-icon">🗂️</div>
+          <div>
+            <div class="wk-meta">Week 9</div>
+            <div class="wk-title">For Loops with Lists — Explore Each Item</div>
+            <p class="wk-desc">Use a loop to go through a list and print each item one by one. The ultimate combo!</p>
+            <div class="tags">
+              <span class="tag blue">for item in list</span>
+              <span class="tag blue">elements</span>
+              <span class="tag blue">iteration</span>
+              <span class="tag blue">combine</span>
+            </div>
+          </div>
+          <a class="go" href="week9.html" aria-label="Go to Week 9">›</a>
+        </article>
+
+        <!-- Week 10 -->
+        <article class="week-card" data-week="10"><span class="wk-done-badge" aria-label="Completed">✓</span>
+          <div class="wk-icon">⚡</div>
+          <div>
+            <div class="wk-meta">Week 10</div>
+            <div class="wk-title">Functions — Py's Special Powers</div>
+            <p class="wk-desc">Create a function that prints a welcome message, joke, or fun fact — then call it anytime!</p>
+            <div class="tags">
+              <span class="tag blue">def</span>
+              <span class="tag blue">functions</span>
+              <span class="tag blue">parameters</span>
+              <span class="tag blue">reusable code</span>
+            </div>
+          </div>
+          <a class="go" href="week10.html" aria-label="Go to Week 10">›</a>
+        </article>
+
+        <!-- Week 11 -->
+        <article class="week-card" data-week="11"><span class="wk-done-badge" aria-label="Completed">✓</span>
+          <div class="wk-icon">🎮</div>
+          <div>
+            <div class="wk-meta">Week 11</div>
+            <div class="wk-title">Mini Game Week</div>
+            <p class="wk-desc">Create a mini game like a guessing game, trivia question, or lucky number challenge!</p>
+            <div class="tags">
+              <span class="tag blue">int(input())</span>
+              <span class="tag blue">elif</span>
+              <span class="tag blue">games</span>
+              <span class="tag blue">score</span>
+            </div>
+          </div>
+          <a class="go" href="week11.html" aria-label="Go to Week 11">›</a>
+        </article>
+
+        <!-- Week 12 -->
+        <article class="week-card" data-week="12"><span class="wk-done-badge" aria-label="Completed">✓</span>
+          <div class="wk-icon">🏆</div>
+          <div>
+            <div class="wk-meta">Week 12</div>
+            <div class="wk-title">Final Project — Your Python Adventure</div>
+            <p class="wk-desc">Create your own mini Python project using everything you've learned. Make it your own! 🐍</p>
+            <div class="tags">
+              <span class="tag blue">capstone</span>
+              <span class="tag blue">creative</span>
+              <span class="tag blue">all concepts</span>
+              <span class="tag blue">celebrate</span>
+            </div>
+          </div>
+          <a class="go" href="week12.html" aria-label="Go to Week 12">›</a>
+        </article>
+
+      </section>
+
+      <!-- RIGHT: SIDEBAR -->
+      <aside class="sidebar" aria-label="Curriculum sidebar">
+        <div class="panel">
+          <div class="panel-head">
+            <div class="panel-title">Your Journey</div>
+            <div class="progress-num"><span id="done">0</span>/<span id="total">12</span></div>
+          </div>
+          <div class="bar" aria-label="Progress bar"><div id="barFill"></div></div>
+
+          <div class="milestones" aria-label="Milestones">
+            <div class="mile" id="m3">
+              <div class="m-ic">⭐</div>
+              <small>Rising Star<br/>Week 3</small>
+            </div>
+            <div class="mile" id="m6">
+              <div class="m-ic">⚡</div>
+              <small>Code Ninja<br/>Week 6</small>
+            </div>
+            <div class="mile" id="m9">
+              <div class="m-ic">🎯</div>
+              <small>Pro Coder<br/>Week 9</small>
+            </div>
+            <div class="mile" id="m12">
+              <div class="m-ic">🏆</div>
+              <small>Python Master<br/>Week 12</small>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="tip">
+            <div class="bulb">💡</div>
+            <div>
+              <div class="panel-title" style="margin-bottom:4px;">Tip</div>
+              <p>Start at Week 1. When you finish a week, click “Mark complete” to track your progress.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-title">What You’ll Need</div>
+          <div class="need-list">
+            <div class="need"><div class="dot">✓</div><div>A laptop or desktop <span>(Chromebook works too)</span></div></div>
+            <div class="need"><div class="dot">✓</div><div>Internet access <span>(for lessons)</span></div></div>
+            <div class="need"><div class="dot">✓</div><div>Notebook + pencil <span>(for planning)</span></div></div>
+            <div class="need"><div class="dot">✓</div><div>A positive attitude <span>(mistakes are normal!)</span></div></div>
+          </div>
+          <div style="margin-top:12px; display:flex; gap:10px; flex-wrap:wrap;">
+            <button class="btn btn-ghost" id="markBtn" type="button">Mark complete</button>
+            <button class="btn btn-ghost" id="resetBtn" type="button">Reset</button>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <script>
+    // Logo wiggle on click
+    const brand = document.querySelector('.brand');
+    const mark = document.querySelector('.logo-mark');
+
+    brand.addEventListener('click', (e) => {
+      e.preventDefault();
+      mark.classList.add('wiggle');
+      setTimeout(() => mark.classList.remove('wiggle'), 500);
+      window.location.href = brand.getAttribute('href');
+    });
+
+    // Logo pop-in on page load
+    window.addEventListener('load', () => {
+      const badge = document.querySelector('.logo-badge');
+      if (badge) badge.classList.add('pop-in');
+    });
+
+    // ── Weeks dropdown ──────────────────────────────────────────
+    const dropdown = document.getElementById('weeksDropdown');
+    const btn = document.getElementById('weeksBtn');
+
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isOpen = dropdown.classList.toggle('open');
+      btn.setAttribute('aria-expanded', String(isOpen));
+    });
+
+    document.addEventListener('click', () => {
+      dropdown.classList.remove('open');
+      btn.setAttribute('aria-expanded', 'false');
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        dropdown.classList.remove('open');
+        btn.setAttribute('aria-expanded', 'false');
+      }
+    });
+
+    // ── Per-week progress (reads hellopy_w{n}_progress from try pages) ──
+    const TOTAL = 12;
+    const doneEl  = document.getElementById('done');
+    const totalEl = document.getElementById('total');
+    const barFill = document.getElementById('barFill');
+    totalEl.textContent = String(TOTAL);
+
+    // Check if a week's try-it challenges are all solved
+    function isWeekComplete(n) {
+      try {
+        const saved = JSON.parse(localStorage.getItem('hellopy_w' + n + '_progress') || 'null');
+        if (!saved || !saved.solved) return false;
+        return saved.solved.every(Boolean);
+      } catch(e) { return false; }
+    }
+
+    // Manual override (mark complete button) uses its own key
+    function getManualDone() {
+      return Math.max(0, Math.min(TOTAL, Number(localStorage.getItem('hellopy_done') || '0')));
+    }
+
+    function countCompleted() {
+      let count = 0;
+      for (let n = 1; n <= TOTAL; n++) {
+        if (isWeekComplete(n)) count++;
+      }
+      // also count manual overrides for weeks without try pages
+      const manual = getManualDone();
+      return Math.max(count, manual);
+    }
+
+    function render() {
+      const done = countCompleted();
+      doneEl.textContent = String(done);
+      barFill.style.width = ((done / TOTAL) * 100) + '%';
+
+      // mark each week card
+      document.querySelectorAll('.week-card[data-week]').forEach(card => {
+        const n = parseInt(card.dataset.week, 10);
+        const complete = isWeekComplete(n) || n <= getManualDone();
+        card.classList.toggle('completed', complete);
+      });
+
+      // milestones
+      document.getElementById('m3').classList.toggle('on', done >= 3);
+      document.getElementById('m6').classList.toggle('on', done >= 6);
+      document.getElementById('m9').classList.toggle('on', done >= 9);
+      document.getElementById('m12').classList.toggle('on', done >= 12);
+    }
+
+    document.getElementById('markBtn').addEventListener('click', () => {
+      const manual = getManualDone();
+      if (manual < TOTAL) {
+        localStorage.setItem('hellopy_done', String(manual + 1));
+        render();
+      }
+    });
+
+    document.getElementById('resetBtn').addEventListener('click', () => {
+      if (!confirm('Reset all progress? This will clear your week completion data.')) return;
+      localStorage.setItem('hellopy_done', '0');
+      for (let n = 1; n <= TOTAL; n++) {
+        localStorage.removeItem('hellopy_w' + n + '_progress');
+      }
+      render();
+    });
+
+    render();
+  </script>
+</body>
+</html>

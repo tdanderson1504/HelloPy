@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>HelloPy | Week 8 Quiz</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --navy:#0B3C5D;
+      --navy2:#082E46;
+      --yellow:#FDBA2D;
+      --bg:#eaf2fb;
+      --ink:#0E1726;
+      --muted:#567086;
+      --stroke: rgba(11,60,93,.14);
+      --focus: rgba(253,186,45,.55);
+      --green: #28c76f;
+      --red: #ff5f5f;
+    }
+
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; margin:0; }
+
+    html{ overflow-x:hidden; }
+
+    body{
+      font-family: Poppins, system-ui, -apple-system, sans-serif;
+      background:
+        radial-gradient(900px 520px at 18% 0%, rgba(253,186,45,.22), transparent 60%),
+        radial-gradient(900px 520px at 85% 5%, rgba(11,60,93,.18), transparent 60%),
+        linear-gradient(180deg, #ffffff, var(--bg));
+      color: var(--ink);
+      min-height: 100%;
+    }
+
+    a:focus-visible, button:focus-visible{
+      outline: 3px solid var(--focus);
+      outline-offset: 3px;
+    }
+
+    /* ── TOPBAR ── */
+    .topbar{
+      height:62px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding: 0 20px;
+      border-bottom:1px solid var(--stroke);
+      background: rgba(244,248,255,.88);
+      backdrop-filter: blur(10px);
+      position: sticky;
+      top:0;
+      z-index:50;
+    }
+
+    .brand{
+      display:flex; align-items:center; gap:14px;
+      text-decoration:none;
+    }
+    .logo-badge{
+      display:flex; align-items:center; gap:14px;
+      padding: 8px 0;
+    }
+    .logo-mark{
+      width:46px; height:auto; display:block;
+      transition: transform .25s ease;
+    }
+    .brand:hover .logo-mark{ transform: translateY(-5px) rotate(-6deg); }
+    .logo-text{
+      font-weight:900; font-size:26px;
+      color: var(--navy); letter-spacing:-.8px;
+      position:relative; display:inline-block; line-height:1;
+    }
+    .logo-text span{ color:var(--yellow); display:inline-block; transform:translateY(-3px); }
+    .logo-text::after{
+      content:""; position:absolute; left:0; bottom:-6px;
+      width:100%; height:7px;
+      background:rgba(253,186,45,.45); border-radius:10px;
+      transform:scaleX(0); transform-origin:left;
+      transition:transform .25s ease;
+    }
+    .brand:hover .logo-text::after{ transform:scaleX(1); }
+
+    .brand-sub{
+      margin-left:10px; padding-left:10px;
+      border-left:1px solid rgba(11,60,93,.18);
+      font-size:12px; color:var(--muted); font-weight:800;
+      white-space:nowrap; align-self:center;
+    }
+
+    @keyframes wiggle{
+      0%{transform:rotate(0)} 25%{transform:rotate(-6deg)}
+      50%{transform:rotate(6deg)} 75%{transform:rotate(-4deg)} 100%{transform:rotate(0)}
+    }
+    .wiggle{ animation:wiggle .5s ease; }
+
+    @keyframes popIn{
+      0%{transform:scale(.92);opacity:0} 70%{transform:scale(1.02);opacity:1} 100%{transform:scale(1);opacity:1}
+    }
+    .logo-badge.pop-in{ animation:popIn .55s ease-out both; }
+
+    .top-actions{ display:flex; align-items:center; gap:10px; }
+
+    .pill{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:8px 12px; border-radius:999px;
+      background:rgba(11,60,93,.06); border:1px solid rgba(11,60,93,.10);
+      color:var(--navy); font-weight:900; font-size:12px;
+    }
+
+    .btn{
+      border:0; cursor:pointer; font-family:inherit;
+      padding:10px 16px; border-radius:12px;
+      font-weight:900; font-size:13px;
+      display:inline-flex; align-items:center; gap:8px;
+      text-decoration:none; transition:.16s ease;
+    }
+    .btn-yellow{ background:var(--yellow); color:#2A1C00; box-shadow:0 8px 20px rgba(253,186,45,.30); }
+    .btn-yellow:hover{ transform:translateY(-1px); }
+    .btn-ghost{ background:rgba(11,60,93,.08); color:var(--navy); }
+    .btn-ghost:hover{ background:rgba(11,60,93,.13); }
+
+    /* ── QUIZ PAGE ── */
+    .quiz-wrap{
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 40px 20px 80px;
+    }
+
+    .quiz-header{
+      text-align:center;
+      margin-bottom: 36px;
+    }
+    .quiz-kicker{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:7px 14px; border-radius:999px;
+      background:rgba(253,186,45,.16); border:1px solid rgba(253,186,45,.35);
+      color:var(--navy); font-weight:900; font-size:12px;
+      margin-bottom:14px;
+    }
+    .quiz-title{
+      font-size: clamp(28px,4vw,40px);
+      font-weight:900; color:var(--navy);
+      letter-spacing:-.6px; line-height:1.1;
+      margin:0 0 10px;
+    }
+    .quiz-title span{ color:var(--yellow); }
+    .quiz-sub{
+      font-size:15px; color:var(--muted);
+      font-weight:600; line-height:1.6;
+      margin:0;
+    }
+
+    /* progress bar */
+    .quiz-progress{
+      margin-bottom: 28px;
+    }
+    .progress-row{
+      display:flex; align-items:center; justify-content:space-between;
+      margin-bottom:8px;
+    }
+    .progress-label{ font-size:12px; font-weight:900; color:var(--muted); }
+    .progress-track{
+      height:8px; border-radius:999px;
+      background:rgba(11,60,93,.10);
+      border:1px solid rgba(11,60,93,.08);
+      overflow:hidden;
+    }
+    .progress-fill{
+      height:100%;
+      background: linear-gradient(90deg, var(--navy), var(--yellow));
+      border-radius:999px;
+      transition: width .4s ease;
+      width:0%;
+    }
+
+    /* question card */
+    .question-card{
+      background:#fff;
+      border:1px solid rgba(11,60,93,.10);
+      border-radius:20px;
+      box-shadow: 0 12px 32px rgba(0,0,0,.08);
+      padding:28px;
+      margin-bottom:16px;
+      display:none;
+    }
+    .question-card.active{ display:block; }
+
+    .q-num{
+      font-size:11px; font-weight:900; letter-spacing:.5px;
+      text-transform:uppercase; color:var(--muted);
+      margin-bottom:10px;
+    }
+    .q-text{
+      font-size:18px; font-weight:800;
+      color:var(--navy); line-height:1.45;
+      margin:0 0 22px;
+    }
+    .q-code{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Courier New", monospace;
+      background:#0f2237; color:#7ee787;
+      border-radius:10px; padding:10px 14px;
+      font-size:13px; display:inline-block;
+      margin-bottom:6px;
+    }
+
+    /* answer options */
+    .options{ display:grid; gap:10px; }
+    .option{
+      display:flex; align-items:center; gap:14px;
+      padding:14px 16px;
+      border-radius:14px;
+      border:2px solid rgba(11,60,93,.12);
+      background:rgba(11,60,93,.03);
+      cursor:pointer;
+      transition:.16s ease;
+      font-weight:700; font-size:14px;
+      color:var(--ink);
+      user-select:none;
+    }
+    .option:hover:not(.locked){ background:rgba(253,186,45,.10); border-color:rgba(253,186,45,.40); }
+    .option-letter{
+      width:30px; height:30px; border-radius:10px; flex:0 0 auto;
+      display:grid; place-items:center;
+      background:rgba(11,60,93,.08); border:1px solid rgba(11,60,93,.12);
+      font-weight:900; font-size:13px; color:var(--navy);
+    }
+    .option.correct{
+      background:rgba(40,199,111,.12);
+      border-color:rgba(40,199,111,.45);
+      color:#0b7a42;
+    }
+    .option.correct .option-letter{
+      background:rgba(40,199,111,.22); border-color:rgba(40,199,111,.45); color:#0b7a42;
+    }
+    .option.wrong{
+      background:rgba(255,95,95,.10);
+      border-color:rgba(255,95,95,.40);
+      color:#a0282f;
+    }
+    .option.wrong .option-letter{
+      background:rgba(255,95,95,.18); border-color:rgba(255,95,95,.40); color:#a0282f;
+    }
+    .option.locked{ cursor:default; }
+
+    /* feedback */
+    .feedback{
+      margin-top:14px;
+      padding:12px 16px;
+      border-radius:12px;
+      font-size:13px; font-weight:800;
+      line-height:1.5;
+      display:none;
+    }
+    .feedback.show{ display:block; }
+    .feedback.ok{ background:rgba(40,199,111,.12); border:1px solid rgba(40,199,111,.30); color:#0b7a42; }
+    .feedback.bad{ background:rgba(255,95,95,.10); border:1px solid rgba(255,95,95,.30); color:#a0282f; }
+
+    /* nav buttons */
+    .q-nav{
+      display:flex; justify-content:flex-end; gap:10px;
+      margin-top:20px;
+    }
+
+    /* ── RESULTS ── */
+    .results{
+      display:none;
+      text-align:center;
+      background:#fff;
+      border:1px solid rgba(11,60,93,.10);
+      border-radius:24px;
+      box-shadow:0 16px 40px rgba(0,0,0,.10);
+      padding:48px 32px;
+    }
+    .results.show{ display:block; }
+    .score-circle{
+      width:110px; height:110px;
+      border-radius:50%;
+      background: linear-gradient(135deg, var(--navy), #1a6fa8);
+      display:grid; place-items:center;
+      margin:0 auto 20px;
+      box-shadow:0 14px 30px rgba(11,60,93,.25);
+    }
+    .score-num{
+      font-size:36px; font-weight:900; color:#fff; line-height:1;
+    }
+    .score-denom{ font-size:14px; color:rgba(255,255,255,.75); font-weight:700; }
+    .result-title{
+      font-size:26px; font-weight:900; color:var(--navy);
+      margin:0 0 10px; letter-spacing:-.4px;
+    }
+    .result-sub{
+      font-size:15px; color:var(--muted); font-weight:600;
+      margin:0 0 28px; line-height:1.6;
+    }
+    .result-actions{ display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
+
+    /* confetti */
+    @keyframes confettiFall{
+      0%{transform:translateY(-10px) rotate(0);opacity:1}
+      100%{transform:translateY(100vh) rotate(720deg);opacity:0}
+    }
+    #confetti-layer{
+      pointer-events:none; position:fixed; inset:0; z-index:9999; overflow:hidden;
+    }
+    .c-piece{
+      position:absolute; width:10px; height:10px;
+      border-radius:2px; animation:confettiFall linear forwards;
+    }
+
+    @media(max-width:560px){
+      .quiz-wrap{ padding:24px 14px 60px; }
+      .question-card{ padding:20px; }
+      .q-text{ font-size:16px; }
+      .brand-sub{ display:none; }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="confetti-layer" aria-hidden="true"></div>
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <a class="brand" href="index.html" aria-label="HelloPy Home">
+      <div class="logo-badge">
+        <img src="py-mascot.png" alt="HelloPy Snake Mascot" class="logo-mark" />
+        <div class="logo-text">Hello<span>Py</span></div>
+        <div class="brand-sub">Week 8 • Quiz</div>
+      </div>
+    </a>
+    <div class="top-actions">
+      <div class="pill">📝 Quiz</div>
+      <a class="btn btn-ghost" href="week8-tryit.html">← Back</a>
+      <a class="btn btn-yellow" href="week2.html" id="nextWeekBtn" style="display:none;">Week 2 →</a>
+    </div>
+  </header>
+
+  <!-- QUIZ -->
+  <div class="quiz-wrap">
+
+    <div class="quiz-header">
+      <div class="quiz-kicker">📋 Week 8 Quiz</div>
+      <h1 class="quiz-title">Test Your <span>Lists</span> Knowledge</h1>
+      <p class="quiz-sub">5 questions · Multiple choice · Take your time!</p>
+    </div>
+
+    <!-- Progress -->
+    <div class="quiz-progress">
+      <div class="progress-row">
+        <span class="progress-label" id="progressLabel">Question 1 of 5</span>
+        <span class="progress-label" id="scoreLabel">0 / 5</span>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+    </div>
+
+    <!-- Q1 -->
+    <div class="question-card active" id="q0">
+      <div class="q-num">Question 1 of 5</div>
+      <p class="q-text">What symbol do you use to create a list in Python?</p>
+      <div class="options">
+        <div class="option" data-correct="false"><span class="option-letter">A</span> ( )</div>
+        <div class="option" data-correct="true"><span class="option-letter">B</span> [ ]</div>
+        <div class="option" data-correct="false"><span class="option-letter">C</span> { }</div>
+        <div class="option" data-correct="false"><span class="option-letter">D</span> " "</div>
+      </div>
+      <div class="feedback" id="fb0"></div>
+      <div class="q-nav">
+        <button class="btn btn-yellow" id="next0" style="display:none;" onclick="goNext(1)">Next →</button>
+      </div>
+    </div>
+
+    <!-- Q2 -->
+    <div class="question-card" id="q1">
+      <div class="q-num">Question 2 of 5</div>
+      <p class="q-text">What will this print?<br/><span class="q-code">fruits = ["apple", "banana", "cherry"]<br/>print(fruits[0])</span></p>
+      <div class="options">
+        <div class="option" data-correct="false"><span class="option-letter">A</span> banana</div>
+        <div class="option" data-correct="true"><span class="option-letter">B</span> apple</div>
+        <div class="option" data-correct="false"><span class="option-letter">C</span> cherry</div>
+        <div class="option" data-correct="false"><span class="option-letter">D</span> 0</div>
+      </div>
+      <div class="feedback" id="fb1"></div>
+      <div class="q-nav">
+        <button class="btn btn-yellow" id="next1" style="display:none;" onclick="goNext(2)">Next →</button>
+      </div>
+    </div>
+
+    <!-- Q3 -->
+    <div class="question-card" id="q2">
+      <div class="q-num">Question 3 of 5</div>
+      <p class="q-text">Can a list store both text and numbers?</p>
+      <div class="options">
+        <div class="option" data-correct="false"><span class="option-letter">A</span> No, only text</div>
+        <div class="option" data-correct="false"><span class="option-letter">B</span> No, only numbers</div>
+        <div class="option" data-correct="true"><span class="option-letter">C</span> Yes, lists can store a mix of both</div>
+        <div class="option" data-correct="false"><span class="option-letter">D</span> Only if you use two separate lists</div>
+      </div>
+      <div class="feedback" id="fb2"></div>
+      <div class="q-nav">
+        <button class="btn btn-yellow" id="next2" style="display:none;" onclick="goNext(3)">Next →</button>
+      </div>
+    </div>
+
+    <!-- Q4 -->
+    <div class="question-card" id="q3">
+      <div class="q-num">Question 4 of 5</div>
+      <p class="q-text">What does <span class="q-code" style="font-size:12px;">len(my_list)</span> return?</p>
+      <div class="options">
+        <div class="option" data-correct="false"><span class="option-letter">A</span> The first item in the list</div>
+        <div class="option" data-correct="false"><span class="option-letter">B</span> The last item in the list</div>
+        <div class="option" data-correct="true"><span class="option-letter">C</span> The number of items in the list</div>
+        <div class="option" data-correct="false"><span class="option-letter">D</span> The longest word in the list</div>
+      </div>
+      <div class="feedback" id="fb3"></div>
+      <div class="q-nav">
+        <button class="btn btn-yellow" id="next3" style="display:none;" onclick="goNext(4)">Next →</button>
+      </div>
+    </div>
+
+    <!-- Q5 -->
+    <div class="question-card" id="q4">
+      <div class="q-num">Question 5 of 5</div>
+      <p class="q-text">How do you add a new item to an existing list?</p>
+      <div class="options">
+        <div class="option" data-correct="false"><span class="option-letter">A</span> <span class="q-code" style="font-size:12px;">list.add("item")</span></div>
+        <div class="option" data-correct="false"><span class="option-letter">B</span> <span class="q-code" style="font-size:12px;">list + "item"</span></div>
+        <div class="option" data-correct="true"><span class="option-letter">C</span> <span class="q-code" style="font-size:12px;">list.append("item")</span></div>
+        <div class="option" data-correct="false"><span class="option-letter">D</span> <span class="q-code" style="font-size:12px;">list.insert("item")</span></div>
+      </div>
+      <div class="feedback" id="fb4"></div>
+      <div class="q-nav">
+        <button class="btn btn-yellow" id="next4" style="display:none;" onclick="showResults()">See Results 🎉</button>
+      </div>
+    </div>
+
+    <!-- Results -->
+    <div class="results" id="results">
+      <div class="score-circle">
+        <div>
+          <div class="score-num" id="finalScore">0</div>
+          <div class="score-denom">out of 5</div>
+        </div>
+      </div>
+      <h2 class="result-title" id="resultTitle">Great job!</h2>
+      <p class="result-sub" id="resultSub">You completed the Week 8 quiz.</p>
+      <div class="result-actions">
+        <button class="btn btn-ghost" onclick="restartQuiz()">🔁 Try Again</button>
+        <a class="btn btn-yellow" href="week9.html">Week 9 →</a>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const TOTAL = 5;
+    let score = 0;
+    let answered = new Array(TOTAL).fill(false);
+
+    const feedbacks = [
+      { ok: "✅ Correct! Lists use square brackets <b>[ ]</b> — like <b>pets = [\"cat\", \"dog\"]</b>.", bad: "❌ Not quite. Lists use <b>square brackets [ ]</b>. Example: <b>pets = [\"cat\", \"dog\"]</b>" },
+      { ok: "✅ Correct! Lists start at index <b>0</b>, so <b>fruits[0]</b> is the first item — <b>apple</b>.", bad: "❌ Not quite. Lists start counting at <b>0</b>, so <b>fruits[0]</b> is the first item: <b>apple</b>." },
+      { ok: "✅ Correct! Lists can store text, numbers, or a mix — very flexible!", bad: "❌ Not quite. Lists can store <b>any type</b> of data — text, numbers, or even both together." },
+      { ok: "✅ Correct! <b>len()</b> returns the total number of items in the list.", bad: "❌ Not quite. <b>len(my_list)</b> returns the <b>count</b> of items — e.g. a list with 3 items returns 3." },
+      { ok: "✅ Correct! <b>.append()</b> adds a new item to the end of a list.", bad: "❌ Not quite. Use <b>.append()</b> to add items: <b>my_list.append(\"new item\")</b>" }
+    ];
+
+    function selectOption(qIndex, optionEl) {
+      if (answered[qIndex]) return;
+      answered[qIndex] = true;
+
+      const card = document.getElementById('q' + qIndex);
+      const options = card.querySelectorAll('.option');
+      const fb = document.getElementById('fb' + qIndex);
+      const nextBtn = document.getElementById('next' + qIndex);
+      const isCorrect = optionEl.dataset.correct === 'true';
+
+      options.forEach(o => {
+        o.classList.add('locked');
+        if (o.dataset.correct === 'true') o.classList.add('correct');
+      });
+
+      if (isCorrect) {
+        optionEl.classList.add('correct');
+        score++;
+        fb.className = 'feedback show ok';
+        fb.innerHTML = feedbacks[qIndex].ok;
+      } else {
+        optionEl.classList.add('wrong');
+        fb.className = 'feedback show bad';
+        fb.innerHTML = feedbacks[qIndex].bad;
+      }
+
+      nextBtn.style.display = 'inline-flex';
+      updateProgress(qIndex + 1);
+    }
+
+    function goNext(qIndex) {
+      document.getElementById('q' + (qIndex - 1)).classList.remove('active');
+      document.getElementById('q' + qIndex).classList.add('active');
+      updateProgress(qIndex);
+    }
+
+    function updateProgress(current) {
+      const pct = (current / TOTAL) * 100;
+      document.getElementById('progressFill').style.width = pct + '%';
+      document.getElementById('progressLabel').textContent = `Question ${Math.min(current + 1, TOTAL)} of ${TOTAL}`;
+      document.getElementById('scoreLabel').textContent = score + ' / ' + TOTAL;
+    }
+
+    function showResults() {
+      document.getElementById('q4').classList.remove('active');
+      const results = document.getElementById('results');
+      results.classList.add('show');
+      document.getElementById('finalScore').textContent = score;
+      document.getElementById('progressFill').style.width = '100%';
+      document.getElementById('progressLabel').textContent = 'Complete!';
+      document.getElementById('scoreLabel').textContent = score + ' / ' + TOTAL;
+
+      const titles = ['Keep Practicing! 💪', 'Good Effort! 👍', 'Nice Work! 😊', 'Great Job! 🌟', 'Almost Perfect! 🔥', 'Perfect Score! 🏆'];
+      const subs = [
+        'Go back and review the lesson — you\'ve got this!',
+        'Review a couple of answers and try again.',
+        'You\'re getting it! A little more practice and you\'ll nail it.',
+        'You\'re doing really well! Keep it up.',
+        'So close to perfect — great effort!',
+        'You got every question right. You\'re a Python star! 🐍'
+      ];
+      document.getElementById('resultTitle').textContent = titles[score];
+      document.getElementById('resultSub').textContent = subs[score];
+
+      if (score >= 4) {
+        launchConfetti();
+        document.getElementById('nextWeekBtn').style.display = 'inline-flex';
+      }
+    }
+
+    function restartQuiz() {
+      score = 0;
+      answered = new Array(TOTAL).fill(false);
+
+      for (let i = 0; i < TOTAL; i++) {
+        const card = document.getElementById('q' + i);
+        card.classList.remove('active');
+        card.querySelectorAll('.option').forEach(o => {
+          o.classList.remove('correct','wrong','locked');
+        });
+        const fb = document.getElementById('fb' + i);
+        fb.className = 'feedback';
+        fb.innerHTML = '';
+        document.getElementById('next' + i).style.display = 'none';
+      }
+
+      document.getElementById('results').classList.remove('show');
+      document.getElementById('q0').classList.add('active');
+      document.getElementById('progressFill').style.width = '0%';
+      document.getElementById('progressLabel').textContent = 'Question 1 of 5';
+      document.getElementById('scoreLabel').textContent = '0 / 5';
+    }
+
+    // Wire up click handlers
+    document.querySelectorAll('.question-card').forEach((card, qIndex) => {
+      card.querySelectorAll('.option').forEach(opt => {
+        opt.addEventListener('click', () => selectOption(qIndex, opt));
+      });
+    });
+
+    // Confetti
+    function launchConfetti() {
+      const layer = document.getElementById('confetti-layer');
+      layer.innerHTML = '';
+      const colors = ['#FDBA2D','#0B3C5D','#28c76f','#ff6b6b','#a78bfa','#38bdf8'];
+      for (let i = 0; i < 100; i++) {
+        const p = document.createElement('div');
+        p.className = 'c-piece';
+        p.style.cssText = [
+          'left:' + (Math.random() * 100) + 'vw',
+          'top:-12px',
+          'background:' + colors[Math.floor(Math.random() * colors.length)],
+          'width:' + (6 + Math.random() * 8) + 'px',
+          'height:' + (6 + Math.random() * 8) + 'px',
+          'animation-duration:' + (1.4 + Math.random() * 1.8) + 's',
+          'animation-delay:' + (Math.random() * .8) + 's',
+          'border-radius:' + (Math.random() > .5 ? '50%' : '2px')
+        ].join(';');
+        layer.appendChild(p);
+      }
+      setTimeout(() => { layer.innerHTML = ''; }, 4000);
+    }
+
+    // Logo pop-in + wiggle
+    window.addEventListener('load', () => {
+      const badge = document.querySelector('.logo-badge');
+      if (badge) badge.classList.add('pop-in');
+    });
+    const brand = document.querySelector('.brand');
+    const mark = document.querySelector('.logo-mark');
+    brand.addEventListener('click', e => {
+      e.preventDefault();
+      mark.classList.add('wiggle');
+      setTimeout(() => mark.classList.remove('wiggle'), 500);
+      window.location.href = brand.getAttribute('href');
+    });
+  </script>
+</body>
+</html>
