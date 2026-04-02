@@ -762,13 +762,12 @@
         ctx.font = `bold ${W * 0.056}px Georgia, "Times New Roman", serif`;
         ctx.fillText(name, W * 0.668, H * 0.395);
 
-        // ── Date — bold, aligned with the signature in the right column ──
-        // Positioned to sit on the DATE underline below the signature
+        // ── Date — sits above the DATE underline in the right column ──
         ctx.textAlign = 'center';
         ctx.fillStyle = '#0B2D5C';
         ctx.font = `bold ${W * 0.024}px Georgia, "Times New Roman", serif`;
-        // Right column centre ≈ 79.5% across; date line sits just below signature ≈ 89% down
-        ctx.fillText(date, W * 0.795, H * 0.89);
+        // DATE column centre ≈ 83% across; text sits just above the line ≈ 76% down
+        ctx.fillText(date, W * 0.83, H * 0.74);
       };
 
       if (img.complete && img.naturalWidth) {
